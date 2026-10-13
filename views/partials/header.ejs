@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · <%= storeName %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="logo" href="/"><%= storeName %></a>
+    <form class="search" action="/" method="get">
+      <input type="search" name="q" placeholder="Search S&R products…" value="<%= typeof q !== 'undefined' ? q : '' %>">
+    </form>
+    <nav class="header-nav">
+      <a href="/how-it-works">How it works</a>
+      <a href="/track">Track order</a>
+      <a class="cart-link" href="/cart">Cart<% if (typeof cartCount !== 'undefined' && cartCount) { %> <span class="badge"><%= cartCount %></span><% } %></a>
+    </nav>
+  </div>
+</header>
+<% if (settings.notice) { %><div class="notice"><div class="wrap"><%= settings.notice %></div></div><% } %>
+<main class="wrap">

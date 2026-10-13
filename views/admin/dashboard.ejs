@@ -1,0 +1,28 @@
+<%- include('_header') %>
+<h1>Dashboard</h1>
+<div class="stats">
+  <div class="stat"><b><%= stats.listed %></b><span>Listed products</span></div>
+  <div class="stat"><b><%= stats.active %></b><span>Active on S&amp;R</span></div>
+  <div class="stat"><b><%= stats.pending %></b><span>Awaiting payment</span></div>
+  <div class="stat"><b><%= stats.toBuy %></b><span>Paid — to buy</span></div>
+  <div class="stat"><b><%= formatPeso(stats.revenue) %></b><span>Paid revenue</span></div>
+</div>
+
+<h2>Catalogue sync <small>adapter: <%= adapter %></small></h2>
+<form method="post" action="/admin/sync">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <button class="btn" <%= syncRunning ? 'disabled' : '' %>><%= syncRunning ? 'Sync running…' : 'Sync now' %></button>
+</form>
+<table class="table">
+  <thead><tr><th>Started (UTC)</th><th>Finished</th><th>Found</th><th>New</th><th>Updated</th><th>Delisted</th><th>Error</th></tr></thead>
+  <tbody>
+  <% runs.forEach(r => { %>
+    <tr><td><%= r.started_at %></td><td><%= r.finished_at || '…' %></td><td><%= r.found %></td><td><%= r.created %></td>
+      <td><%= r.updated %></td><td><%= r.deactivated %></td><td class="err"><%= r.error || '' %></td></tr>
+  <% }) %>
+  </tbody>
+</table>
+
+<h2>Recent orders</h2>
+<%- include('_orders-table', { orders }) %>
+<%- include('_footer') %>

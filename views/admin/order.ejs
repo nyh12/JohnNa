@@ -1,0 +1,44 @@
+<%- include('_header') %>
+<h1>Order <%= order.code %></h1>
+<div class="checkout">
+  <div>
+    <table class="table">
+      <thead><tr><th>Product</th><th>Qty</th><th>S&amp;R price</th><th>Our price</th><th>Line total</th></tr></thead>
+      <tbody>
+      <% items.forEach(i => { %>
+        <tr>
+          <td><%= i.name %><% if (i.source_url) { %> <a href="<%= i.source_url %>" target="_blank" rel="noopener">↗</a><% } %></td>
+          <td><%= i.qty %></td><td><%= formatPeso(i.source_price) %></td><td><%= formatPeso(i.unit_price) %></td>
+          <td><%= formatPeso(i.unit_price * i.qty) %></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+    <% const cost = items.reduce((s, i) => s + i.source_price * i.qty, 0); %>
+    <div class="summary">
+      <div><span>Subtotal</span><span><%= formatPeso(order.subtotal) %></span></div>
+      <div><span>Delivery</span><span><%= formatPeso(order.delivery_fee) %></span></div>
+      <div class="total"><span>Total</span><span><%= formatPeso(order.total) %></span></div>
+      <div class="muted"><span>Est. S&amp;R cost</span><span><%= formatPeso(cost) %></span></div>
+      <div class="muted"><span>Est. gross margin</span><span><%= formatPeso(order.subtotal - cost) %></span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Customer</h3>
+    <p><%= order.customer_name %><br><%= order.phone %><% if (order.email) { %><br><%= order.email %><% } %></p>
+    <p><%= order.address %><% if (order.area) { %><br><%= order.area %><% } %></p>
+    <p>Payment: <%= order.payment_method %></p>
+    <% if (order.notes) { %><p><b>Customer notes:</b> <%= order.notes %></p><% } %>
+    <form method="post" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label>Status
+        <select name="status">
+          <% Object.entries(ORDER_STATUSES).forEach(([k, v]) => { %><option value="<%= k %>" <%= order.status === k ? 'selected' : '' %>><%= v %></option><% }) %>
+        </select>
+      </label>
+      <label>Internal notes <textarea name="admin_notes" rows="4"><%= order.admin_notes || '' %></textarea></label>
+      <button class="btn">Save</button>
+    </form>
+  </div>
+</div>
+<%- include('_footer') %>

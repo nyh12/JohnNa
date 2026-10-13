@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+<div class="layout">
+  <aside class="sidebar">
+    <h3>Categories</h3>
+    <ul class="cat-list">
+      <li><a class="<%= !category ? 'active' : '' %>" href="/<%= q ? '?q=' + encodeURIComponent(q) : '' %>">All</a></li>
+      <% categories.forEach(c => { %>
+        <li><a class="<%= c.category === category ? 'active' : '' %>" href="/?category=<%= encodeURIComponent(c.category) %>"><%= c.category %> <small>(<%= c.n %>)</small></a></li>
+      <% }) %>
+    </ul>
+  </aside>
+  <section>
+    <div class="list-head">
+      <h1><%= q ? `Results for "${q}"` : title %> <small><%= total %> items</small></h1>
+      <form method="get" action="/">
+        <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+        <% if (category) { %><input type="hidden" name="category" value="<%= category %>"><% } %>
+        <select name="sort" onchange="this.form.submit()">
+          <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Name</option>
+          <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: low to high</option>
+          <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: high to low</option>
+          <option value="new" <%= sort === 'new' ? 'selected' : '' %>>Newest</option>
+        </select>
+      </form>
+    </div>
+    <% if (added) { %><p class="flash">Added to cart. <a href="/cart">View cart →</a></p><% } %>
+    <% if (!products.length) { %>
+      <p class="empty">No products found. The catalogue may still be syncing — please check back shortly.</p>
+    <% } %>
+    <div class="grid">
+      <% products.forEach(p => { %>
+        <article class="card <%= p.in_stock ? '' : 'oos' %>">
+          <a href="/product/<%= p.id %>" class="card-img"><%- include('partials/product-image', { p }) %></a>
+          <div class="card-body">
+            <% if (p.brand) { %><div class="brand"><%= p.brand %></div><% } %>
+            <a href="/product/<%= p.id %>" class="name"><%= p.name %></a>
+            <div class="price"><%= formatPeso(p.price) %></div>
+            <% if (p.in_stock) { %>
+              <form method="post" action="/cart/add">
+                <input type="hidden" name="productId" value="<%= p.id %>">
+                <button class="btn">Add to cart</button>
+              </form>
+            <% } else { %>
+              <span class="tag">Out of stock</span>
+            <% } %>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+    <% if (pages > 1) { %>
+      <nav class="pager">
+        <% for (let i = 1; i <= pages; i++) {
+             const qs = new URLSearchParams({ ...(q && { q }), ...(category && { category }), sort, page: i }); %>
+          <a class="<%= i === page ? 'active' : '' %>" href="/?<%= qs %>"><%= i %></a>
+        <% } %>
+      </nav>
+    <% } %>
+  </section>
+</div>
+<%- include('partials/footer') %>

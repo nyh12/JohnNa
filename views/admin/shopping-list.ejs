@@ -1,0 +1,20 @@
+<%- include('_header') %>
+<h1>Shopping list <small>paid orders not yet purchased</small></h1>
+<p class="muted">After buying, set those orders to “Purchased at S&amp;R” so they drop off this list.</p>
+<table class="table">
+  <thead><tr><th></th><th>Product</th><th>Qty</th><th>S&amp;R price</th><th>Orders</th></tr></thead>
+  <tbody>
+  <% items.forEach(i => { %>
+    <tr>
+      <td><input type="checkbox"></td>
+      <td><%= i.name %><% if (i.source_url) { %> <a href="<%= i.source_url %>" target="_blank" rel="noopener">↗</a><% } %></td>
+      <td><b><%= i.qty %></b></td>
+      <td><%= formatPeso(i.source_price) %></td>
+      <td><small><%= i.orders %></small></td>
+    </tr>
+  <% }) %>
+  <% if (!items.length) { %><tr><td colspan="5" class="muted">Nothing to buy right now.</td></tr><% } %>
+  </tbody>
+</table>
+<p>Estimated S&amp;R spend: <b><%= formatPeso(estimate) %></b></p>
+<%- include('_footer') %>

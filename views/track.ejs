@@ -1,0 +1,9 @@
+<%- include('partials/header') %>
+<h1>Track your order</h1>
+<% if (error) { %><div class="errors"><%= error %></div><% } %>
+<form method="post" action="/track" class="form narrow">
+  <label>Order code <input name="code" required placeholder="SR251013-ABCDE" value="<%= code %>"></label>
+  <label>Mobile number used for the order <input name="phone" required value="<%= phone %>"></label>
+  <button class="btn">Find order</button>
+</form>
+<%- include('partials/footer') %>

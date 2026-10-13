@@ -1,0 +1,26 @@
+<%- include('_header') %>
+<h1>Settings</h1>
+<% if (saved) { %><p class="flash">Saved.</p><% } %>
+<% const labels = {
+  markup_percent: ['Markup (%)', 'Added on top of the S&R shelf price.'],
+  service_fee_per_item: ['Service fee per item (₱)', 'Flat amount added per unit.'],
+  round_to: ['Round prices up to nearest (₱)', 'e.g. 5 → ₱1,232 becomes ₱1,235.'],
+  delivery_fee: ['Delivery fee (₱)', ''],
+  free_delivery_over: ['Free delivery over (₱)', '0 = never free.'],
+  min_order: ['Minimum order (₱)', '0 = no minimum.'],
+  payment_instructions: ['Payment instructions', 'Shown on the order page for GCash / bank transfer.'],
+  delivery_areas: ['Delivery areas', 'One per line. Leave empty to accept any area.'],
+  notice: ['Site notice banner', 'Leave empty to hide.'],
+}; %>
+<form method="post" class="form narrow">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% keys.forEach(k => { const [label, help] = labels[k] || [k, '']; const multi = ['payment_instructions','delivery_areas','notice'].includes(k); %>
+    <label><%= label %>
+      <% if (multi) { %><textarea name="<%= k %>" rows="4"><%= settings[k] %></textarea>
+      <% } else { %><input type="number" step="any" min="0" name="<%= k %>" value="<%= settings[k] %>"><% } %>
+      <% if (help) { %><small class="muted"><%= help %></small><% } %>
+    </label>
+  <% }) %>
+  <button class="btn">Save settings</button>
+</form>
+<%- include('_footer') %>

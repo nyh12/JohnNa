@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+<h1>Order <%= order.code %></h1>
+<p class="status status-<%= order.status %>">Status: <strong><%= order.status %></strong></p>
+<% if (order.status === 'pending' && order.payment_method !== 'cod') { %>
+  <div class="panel">
+    <h3>Payment instructions</h3>
+    <pre class="instructions"><%= settings.payment_instructions %></pre>
+    <p>Amount to pay: <strong><%= formatPeso(order.total) %></strong> — please include your order code <strong><%= order.code %></strong>.</p>
+  </div>
+<% } %>
+<table class="table">
+  <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+  <tbody>
+  <% items.forEach(i => { %>
+    <tr><td><%= i.name %></td><td><%= i.qty %></td><td><%= formatPeso(i.unit_price) %></td><td><%= formatPeso(i.unit_price * i.qty) %></td></tr>
+  <% }) %>
+  </tbody>
+</table>
+<div class="summary">
+  <div><span>Subtotal</span><span><%= formatPeso(order.subtotal) %></span></div>
+  <div><span>Delivery</span><span><%= order.delivery_fee ? formatPeso(order.delivery_fee) : 'FREE' %></span></div>
+  <div class="total"><span>Total</span><span><%= formatPeso(order.total) %></span></div>
+</div>
+<p class="muted">Deliver to: <%= order.customer_name %>, <%= order.phone %> — <%= order.address %><%= order.area ? ', ' + order.area : '' %>.
+Payment: <%= PAYMENT_METHODS[order.payment_method] || order.payment_method %>. Save your order code to track this order later.</p>
+<%- include('partials/footer') %>

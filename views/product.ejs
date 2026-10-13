@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<p class="crumbs"><a href="/">All</a><% if (product.category) { %> › <a href="/?category=<%= encodeURIComponent(product.category) %>"><%= product.category %></a><% } %></p>
+<div class="product-detail">
+  <div class="detail-img"><%- include('partials/product-image', { p: product }) %></div>
+  <div>
+    <% if (product.brand) { %><div class="brand"><%= product.brand %></div><% } %>
+    <h1><%= product.name %></h1>
+    <div class="price big"><%= formatPeso(product.price) %></div>
+    <p class="muted">Price includes our shopping &amp; handling fee. Delivery fee is calculated at checkout.</p>
+    <% if (product.in_stock) { %>
+      <form method="post" action="/cart/add" class="add-form">
+        <input type="hidden" name="productId" value="<%= product.id %>">
+        <input type="hidden" name="next" value="cart">
+        <label>Qty <input type="number" name="qty" value="1" min="1" max="99"></label>
+        <button class="btn btn-lg">Add to cart</button>
+      </form>
+    <% } else { %>
+      <p class="tag">Currently out of stock at S&amp;R</p>
+    <% } %>
+    <% if (product.description) { %><div class="description"><%= product.description %></div><% } %>
+  </div>
+</div>
+<%- include('partials/footer') %>

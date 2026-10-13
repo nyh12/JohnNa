@@ -1,0 +1,36 @@
+<%- include('_header') %>
+<h1>Products</h1>
+<form method="get" class="inline-form">
+  <input type="search" name="q" value="<%= q %>" placeholder="Name, brand or SKU">
+  <select name="filter">
+    <% [['all','All'],['hidden','Hidden'],['inactive','Delisted from S&R'],['oos','Out of stock'],['override','Price override']].forEach(([k, v]) => { %>
+      <option value="<%= k %>" <%= filter === k ? 'selected' : '' %>><%= v %></option>
+    <% }) %>
+  </select>
+  <button class="btn btn-secondary">Filter</button>
+</form>
+<p class="muted">Showing up to 200 products. Leave “Override” blank to use the automatic price (S&amp;R price + markup).</p>
+<table class="table">
+  <thead><tr><th>Product</th><th>Category</th><th>S&amp;R</th><th>Auto price</th><th>Status</th><th>Override / visibility</th></tr></thead>
+  <tbody>
+  <% products.forEach(p => { %>
+    <tr class="<%= p.active && !p.hidden ? '' : 'unavailable' %>">
+      <td><%= p.name %><br><small><%= p.brand || '' %> · <%= p.source_id %></small>
+        <% if (p.url) { %> <a href="<%= p.url %>" target="_blank" rel="noopener">↗</a><% } %></td>
+      <td><%= p.category || '' %></td>
+      <td><%= formatPeso(p.source_price) %></td>
+      <td><%= formatPeso(p.autoPrice) %></td>
+      <td><%= p.active ? (p.in_stock ? 'In stock' : 'Out of stock') : 'Delisted' %><%= p.hidden ? ' · hidden' : '' %></td>
+      <td>
+        <form method="post" action="/admin/products/<%= p.id %>" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="number" step="0.01" min="0" name="price_override" value="<%= p.price_override ?? '' %>" placeholder="auto" class="qty-wide">
+          <label class="radio"><input type="checkbox" name="hidden" value="1" <%= p.hidden ? 'checked' : '' %>> hide</label>
+          <button class="btn btn-small">Save</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+  </tbody>
+</table>
+<%- include('_footer') %>

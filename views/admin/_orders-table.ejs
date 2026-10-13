@@ -1,0 +1,17 @@
+<table class="table">
+  <thead><tr><th>Code</th><th>Date (UTC)</th><th>Customer</th><th>Area</th><th>Payment</th><th>Total</th><th>Status</th></tr></thead>
+  <tbody>
+  <% orders.forEach(o => { %>
+    <tr>
+      <td><a href="/admin/orders/<%= o.id %>"><%= o.code %></a></td>
+      <td><%= o.created_at %></td>
+      <td><%= o.customer_name %><br><small><%= o.phone %></small></td>
+      <td><%= o.area || '' %></td>
+      <td><%= o.payment_method %></td>
+      <td><%= formatPeso(o.total) %></td>
+      <td><span class="status status-<%= o.status %>"><%= ORDER_STATUSES[o.status] || o.status %></span></td>
+    </tr>
+  <% }) %>
+  <% if (!orders.length) { %><tr><td colspan="7" class="muted">No orders.</td></tr><% } %>
+  </tbody>
+</table>

@@ -1,0 +1,32 @@
+{
+  "name": "johnna",
+  "version": "1.0.0",
+  "description": "S&R Philippines proxy-shopping (pasabuy) store with automatic product sync",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning src/server.js",
+    "dev": "node --no-warnings=ExperimentalWarning --watch src/server.js",
+    "sync": "node --no-warnings=ExperimentalWarning scripts/sync.js",
+    "test": "node --no-warnings=ExperimentalWarning --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyh12/JohnNa.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nyh12/JohnNa/issues"
+  },
+  "homepage": "https://github.com/nyh12/JohnNa#readme",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^7.0.1",
+    "express": "^4.22.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22.5"
+  }
+}

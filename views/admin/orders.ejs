@@ -1,0 +1,10 @@
+<%- include('_header') %>
+<h1>Orders</h1>
+<nav class="tabs">
+  <a class="<%= !status ? 'active' : '' %>" href="/admin/orders">All</a>
+  <% Object.entries(ORDER_STATUSES).forEach(([k, v]) => { %>
+    <a class="<%= status === k ? 'active' : '' %>" href="/admin/orders?status=<%= k %>"><%= v %></a>
+  <% }) %>
+</nav>
+<%- include('_orders-table', { orders }) %>
+<%- include('_footer') %>

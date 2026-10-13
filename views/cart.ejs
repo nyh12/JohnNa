@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+<h1>Your cart</h1>
+<% if (!cart.lines.length) { %>
+  <p class="empty">Your cart is empty. <a href="/">Continue shopping →</a></p>
+<% } else { %>
+  <form method="post" action="/cart/update">
+    <table class="table cart-table">
+      <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+      <tbody>
+      <% cart.lines.forEach(l => { %>
+        <tr class="<%= l.available ? '' : 'unavailable' %>">
+          <td><a href="/product/<%= l.product.id %>"><%= l.product.name %></a>
+            <% if (!l.available) { %><div class="tag">No longer available — will not be ordered</div><% } %></td>
+          <td><%= formatPeso(l.unitPrice) %></td>
+          <td><input type="number" name="qty_<%= l.product.id %>" value="<%= l.qty %>" min="0" max="99" class="qty"></td>
+          <td><%= formatPeso(l.lineTotal) %></td>
+          <td><button class="link" name="remove" value="<%= l.product.id %>">Remove</button></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+    <button class="btn btn-secondary">Update cart</button>
+  </form>
+  <div class="summary">
+    <div><span>Subtotal</span><span><%= formatPeso(cart.subtotal) %></span></div>
+    <div><span>Delivery</span><span><%= cart.delivery ? formatPeso(cart.delivery) : 'FREE' %></span></div>
+    <% if (Number(settings.free_delivery_over) > 0 && cart.delivery) { %>
+      <div class="muted small">Free delivery on orders over <%= formatPeso(settings.free_delivery_over) %></div>
+    <% } %>
+    <div class="total"><span>Total</span><span><%= formatPeso(cart.total) %></span></div>
+    <% if (cart.count) { %><a class="btn btn-lg" href="/checkout">Proceed to checkout</a><% } %>
+  </div>
+<% } %>
+<%- include('partials/footer') %>

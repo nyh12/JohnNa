@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<h1>Checkout</h1>
+<% if (errors.length) { %><div class="errors"><ul><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div><% } %>
+<div class="checkout">
+  <form method="post" action="/checkout" class="form">
+    <label>Full name <input name="customer_name" required value="<%= form.customer_name || '' %>"></label>
+    <label>Mobile number <input name="phone" required placeholder="09171234567" value="<%= form.phone || '' %>"></label>
+    <label>Email (optional) <input type="email" name="email" value="<%= form.email || '' %>"></label>
+    <% const areas = String(settings.delivery_areas || '').split('\n').map(s => s.trim()).filter(Boolean); %>
+    <% if (areas.length) { %>
+      <label>Delivery area
+        <select name="area" required>
+          <option value="">Choose…</option>
+          <% areas.forEach(a => { %><option <%= form.area === a ? 'selected' : '' %>><%= a %></option><% }) %>
+        </select>
+      </label>
+    <% } %>
+    <label>Complete address <textarea name="address" rows="3" required placeholder="House no., street, barangay, city"><%= form.address || '' %></textarea></label>
+    <label>Notes (optional) <textarea name="notes" rows="2" placeholder="Substitutions allowed? Preferred delivery time?"><%= form.notes || '' %></textarea></label>
+    <fieldset>
+      <legend>Payment method</legend>
+      <% Object.entries(PAYMENT_METHODS).forEach(([k, v]) => { %>
+        <label class="radio"><input type="radio" name="payment_method" value="<%= k %>" <%= form.payment_method === k ? 'checked' : '' %> required> <%= v %></label>
+      <% }) %>
+    </fieldset>
+    <button class="btn btn-lg">Place order</button>
+  </form>
+  <div class="summary">
+    <h3>Order summary</h3>
+    <% cart.lines.filter(l => l.available).forEach(l => { %>
+      <div><span><%= l.qty %> × <%= l.product.name %></span><span><%= formatPeso(l.lineTotal) %></span></div>
+    <% }) %>
+    <hr>
+    <div><span>Subtotal</span><span><%= formatPeso(cart.subtotal) %></span></div>
+    <div><span>Delivery</span><span><%= cart.delivery ? formatPeso(cart.delivery) : 'FREE' %></span></div>
+    <div class="total"><span>Total</span><span><%= formatPeso(cart.total) %></span></div>
+  </div>
+</div>
+<%- include('partials/footer') %>

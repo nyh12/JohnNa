@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<h1>How it works</h1>
+<ol class="steps">
+  <li><strong>Browse &amp; order.</strong> Our catalogue is synced automatically from S&amp;R's online store. No S&amp;R membership needed.</li>
+  <li><strong>Pay.</strong> Settle via GCash or bank transfer using the instructions on your order page (or choose cash on delivery where available).</li>
+  <li><strong>We shop.</strong> Once paid, we buy your items at S&amp;R using our membership. If an item is unavailable we'll contact you for a substitute or refund.</li>
+  <li><strong>We deliver.</strong> Your order is delivered to your door. Track the status anytime with your order code.</li>
+</ol>
+<h3>Delivery areas</h3>
+<ul><% String(settings.delivery_areas || '').split('\n').filter(s => s.trim()).forEach(a => { %><li><%= a %></li><% }) %></ul>
+<p>Delivery fee: <%= formatPeso(settings.delivery_fee) %><% if (Number(settings.free_delivery_over) > 0) { %>, free on orders over <%= formatPeso(settings.free_delivery_over) %><% } %>.</p>
+<%- include('partials/footer') %>
