@@ -8,6 +8,29 @@
   <div class="stat"><b><%= formatPeso(stats.revenue) %></b><span>Paid revenue</span></div>
 </div>
 
+<h2>Sales commission <small>판매 수수료</small></h2>
+<div class="panel commission">
+  <form method="post" action="/admin/commission">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Commission on S&amp;R member price<br>
+      <input class="big-input" type="number" name="markup_percent" min="0" max="100" step="0.1" value="<%= settings.markup_percent %>"> %
+    </label>
+    <button class="btn">Save</button>
+    <% if (commissionSaved) { %><p class="flash">Saved — all product prices updated.</p><% } %>
+    <% if (commissionError) { %><p class="errors">Enter a number between 0 and 100.</p><% } %>
+  </form>
+  <div>
+    <p>Example: S&amp;R member price <b><%= formatPeso(example.source_price) %></b>
+      → our price <b><%= formatPeso(example.price) %></b>
+      (S&amp;R non-member price <%= formatPeso(example.regular_price) %>)</p>
+    <p class="muted small">0% = sell at exactly the S&amp;R member price. Prices update immediately on the shop.
+      <% if (settings.cap_at_regular === '1') { %>Prices are capped at the S&amp;R non-member price (change in Settings).<% } %></p>
+    <% if (Number(settings.markup_percent) >= 5) { %>
+      <p class="warn">S&amp;R's non-member surcharge is about 5%. At <%= settings.markup_percent %>% customers save little or nothing compared to buying from S&amp;R directly as non-members.</p>
+    <% } %>
+  </div>
+</div>
+
 <h2>Catalogue sync <small>adapter: <%= adapter %></small></h2>
 <form method="post" action="/admin/sync">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">

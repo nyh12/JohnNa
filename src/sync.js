@@ -22,11 +22,11 @@ async function runSync(db, { adapterName, adapterOptions, log = console.log }) {
   const select = db.prepare('SELECT id FROM products WHERE source_id = ?');
   const insert = db.prepare(`
     INSERT INTO products (source_id, url, name, brand, category, description, image,
-                          source_price, currency, in_stock, active, last_seen, last_sync_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), ?)`);
+                          source_price, regular_price, currency, in_stock, active, last_seen, last_sync_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), ?)`);
   const update = db.prepare(`
     UPDATE products SET url = ?, name = ?, brand = ?, category = ?, description = ?, image = ?,
-      source_price = ?, currency = ?, in_stock = ?, active = 1, last_seen = datetime('now'),
+      source_price = ?, regular_price = ?, currency = ?, in_stock = ?, active = 1, last_seen = datetime('now'),
       last_sync_id = ?, updated_at = datetime('now')
     WHERE id = ?`);
 
@@ -36,7 +36,7 @@ async function runSync(db, { adapterName, adapterOptions, log = console.log }) {
       stats.found++;
       const fields = [
         p.url, p.name, p.brand, p.category, p.description, p.image,
-        p.price, p.currency || 'PHP', p.inStock ? 1 : 0,
+        p.price, p.regularPrice ?? null, p.currency || 'PHP', p.inStock ? 1 : 0,
       ];
       const existing = select.get(p.sourceId);
       if (existing) {

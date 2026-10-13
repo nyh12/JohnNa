@@ -9,9 +9,9 @@
   </select>
   <button class="btn btn-secondary">Filter</button>
 </form>
-<p class="muted">Showing up to 200 products. Leave “Override” blank to use the automatic price (S&amp;R price + markup).</p>
+<p class="muted">Showing up to 200 products. Leave “Override” blank to use the automatic price (S&amp;R member price + commission).</p>
 <table class="table">
-  <thead><tr><th>Product</th><th>Category</th><th>S&amp;R</th><th>Auto price</th><th>Status</th><th>Override / visibility</th></tr></thead>
+  <thead><tr><th>Product</th><th>Category</th><th>S&amp;R member</th><th>S&amp;R non-member</th><th>Auto price</th><th>Status</th><th>Override / visibility</th></tr></thead>
   <tbody>
   <% products.forEach(p => { %>
     <tr class="<%= p.active && !p.hidden ? '' : 'unavailable' %>">
@@ -19,6 +19,7 @@
         <% if (p.url) { %> <a href="<%= p.url %>" target="_blank" rel="noopener">↗</a><% } %></td>
       <td><%= p.category || '' %></td>
       <td><%= formatPeso(p.source_price) %></td>
+      <td><%= p.regular_price ? formatPeso(p.regular_price) : '—' %></td>
       <td><%= formatPeso(p.autoPrice) %></td>
       <td><%= p.active ? (p.in_stock ? 'In stock' : 'Out of stock') : 'Delisted' %><%= p.hidden ? ' · hidden' : '' %></td>
       <td>

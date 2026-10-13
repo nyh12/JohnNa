@@ -17,11 +17,13 @@ module.exports = {
   adminPassword: env.ADMIN_PASSWORD || '',
   storeName: env.STORE_NAME || 'S&R Pasabuy PH',
 
-  // Which scraper adapter to use: "sitemap" | "shopify" | "mock"
-  scraperAdapter: env.SCRAPER_ADAPTER || 'mock',
+  // Which scraper adapter to use: "snr" | "sitemap" | "shopify" | "mock"
+  scraperAdapter: env.SCRAPER_ADAPTER || 'snr',
   snr: {
     baseUrl: (env.SNR_BASE_URL || 'https://www.snrshopping.com').replace(/\/$/, ''),
     sitemapUrl: env.SNR_SITEMAP_URL || '',
+    // Comma-separated category URLs; empty = discover /category/ links on the home page
+    categoryUrls: (env.SNR_CATEGORY_URLS || '').split(',').map((s) => s.trim()).filter(Boolean),
     productUrlPattern: env.SNR_PRODUCT_URL_PATTERN || '/products?/|/p/|product',
     requestDelayMs: Number(env.SNR_REQUEST_DELAY_MS || 1500),
     maxProducts: Number(env.SNR_MAX_PRODUCTS || 0), // 0 = unlimited

@@ -2,9 +2,10 @@
 <h1>Settings</h1>
 <% if (saved) { %><p class="flash">Saved.</p><% } %>
 <% const labels = {
-  markup_percent: ['Markup (%)', 'Added on top of the S&R shelf price.'],
+  markup_percent: ['Sales commission % (판매 수수료)', 'Added on top of the S&R member price. 0 = sell at the member price.'],
   service_fee_per_item: ['Service fee per item (₱)', 'Flat amount added per unit.'],
-  round_to: ['Round prices up to nearest (₱)', 'e.g. 5 → ₱1,232 becomes ₱1,235.'],
+  round_to: ['Round prices up to nearest (₱)', '0 = no rounding (keep centavos). e.g. 5 → ₱1,232 becomes ₱1,235.'],
+  cap_at_regular: ['Cap at S&R non-member price', 'Never charge more than S&R charges non-members (1 = on, 0 = off).'],
   delivery_fee: ['Delivery fee (₱)', ''],
   free_delivery_over: ['Free delivery over (₱)', '0 = never free.'],
   min_order: ['Minimum order (₱)', '0 = no minimum.'],
@@ -16,7 +17,8 @@
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <% keys.forEach(k => { const [label, help] = labels[k] || [k, '']; const multi = ['payment_instructions','delivery_areas','notice'].includes(k); %>
     <label><%= label %>
-      <% if (multi) { %><textarea name="<%= k %>" rows="4"><%= settings[k] %></textarea>
+      <% if (k === 'cap_at_regular') { %><select name="<%= k %>"><option value="1" <%= settings[k] === '1' ? 'selected' : '' %>>On</option><option value="0" <%= settings[k] === '0' ? 'selected' : '' %>>Off</option></select>
+      <% } else if (multi) { %><textarea name="<%= k %>" rows="4"><%= settings[k] %></textarea>
       <% } else { %><input type="number" step="any" min="0" name="<%= k %>" value="<%= settings[k] %>"><% } %>
       <% if (help) { %><small class="muted"><%= help %></small><% } %>
     </label>

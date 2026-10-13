@@ -130,3 +130,31 @@ test('browse → cart → checkout → admin', async (t) => {
   res = await fetch(base + '/admin/shopping-list', { headers: auth });
   assert.match(await res.text(), new RegExp(product.name));
 });
+
+test('admin can change the sales commission and shop prices follow', async (t) => {
+  const { db, server, base } = await setup();
+  t.after(() => server.close());
+  const product = db.prepare('SELECT * FROM products WHERE in_stock = 1 ORDER BY id LIMIT 1').get();
+  const auth = { Authorization: 'Basic ' + Buffer.from('admin:secret').toString('base64') };
+
+  // default 0%: shop shows exactly the member price
+  let html = await (await fetch(`${base}/product/${product.id}`)).text();
+  assert.ok(html.includes(new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(product.source_price)));
+  assert.match(html, /S&amp;R member price/);
+
+  const dash = await (await fetch(base + '/admin', { headers: auth })).text();
+  const csrf = dash.match(/name="_csrf" value="([a-f0-9]+)"/)[1];
+  const post = (v) => fetch(base + '/admin/commission', {
+    method: 'POST', redirect: 'manual',
+    headers: { ...auth, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `markup_percent=${v}&_csrf=${csrf}`,
+  });
+
+  assert.equal((await post('abc')).headers.get('location'), '/admin?commission=invalid');
+  assert.equal((await post('2')).headers.get('location'), '/admin?commission=saved');
+  assert.equal(db.prepare("SELECT value FROM settings WHERE key = 'markup_percent'").get().value, '2');
+
+  const expected = Math.ceil(product.source_price * 1.02 * 100 - 1e-6) / 100;
+  html = await (await fetch(`${base}/product/${product.id}`)).text();
+  assert.ok(html.includes(new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(expected)));
+});

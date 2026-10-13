@@ -1,6 +1,6 @@
 const crypto = require('node:crypto');
 const express = require('express');
-const { salePrice } = require('../pricing');
+const { salePrice, savings } = require('../pricing');
 const { readCart, writeCart, setQty, priceCart } = require('../cart');
 const { tx } = require('../db');
 
@@ -55,7 +55,7 @@ module.exports = function shopRoutes(db) {
     const products = db
       .prepare(`SELECT * FROM products WHERE ${whereSql} ORDER BY in_stock DESC, ${SORTS[sort]} LIMIT ? OFFSET ?`)
       .all(...params, PAGE_SIZE, (page - 1) * PAGE_SIZE)
-      .map((p) => ({ ...p, price: salePrice(p, res.locals.settings) }));
+      .map((p) => withPrice(p, res.locals.settings));
 
     res.render('index', {
       title: category || 'All products',
@@ -75,7 +75,7 @@ module.exports = function shopRoutes(db) {
     if (!product) return next();
     res.render('product', {
       title: product.name,
-      product: { ...product, price: salePrice(product, res.locals.settings) },
+      product: withPrice(product, res.locals.settings),
     });
   });
 
@@ -180,6 +180,11 @@ module.exports = function shopRoutes(db) {
 
   return router;
 };
+
+function withPrice(product, settings) {
+  const price = salePrice(product, settings);
+  return { ...product, price, save: savings(product, price) };
+}
 
 function validateCheckout(form, settings) {
   const errors = [];

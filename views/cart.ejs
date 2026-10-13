@@ -28,6 +28,7 @@
       <div class="muted small">Free delivery on orders over <%= formatPeso(settings.free_delivery_over) %></div>
     <% } %>
     <div class="total"><span>Total</span><span><%= formatPeso(cart.total) %></span></div>
+    <% if (cart.savings > 0) { %><div class="save"><span>You save vs S&amp;R non-member prices</span><span><%= formatPeso(cart.savings) %></span></div><% } %>
     <% if (cart.count) { %><a class="btn btn-lg" href="/checkout">Proceed to checkout</a><% } %>
   </div>
 <% } %>

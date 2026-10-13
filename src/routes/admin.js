@@ -41,7 +41,24 @@ module.exports = function adminRoutes(db, { triggerSync }) {
       .get();
     const runs = db.prepare('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 10').all();
     const orders = db.prepare('SELECT * FROM orders ORDER BY id DESC LIMIT 10').all();
-    res.render('admin/dashboard', { title: 'Dashboard', stats, runs, orders, adapter: config.scraperAdapter });
+    const settings = res.locals.settings;
+    const example = { source_price: 1000, regular_price: 1050 };
+    res.render('admin/dashboard', {
+      title: 'Dashboard', stats, runs, orders, adapter: config.scraperAdapter,
+      example: { ...example, price: salePrice(example, settings) },
+      commissionSaved: req.query.commission === 'saved',
+      commissionError: req.query.commission === 'invalid',
+    });
+  });
+
+  // Sales commission (%) on top of the S&R member price — 판매 수수료
+  router.post('/commission', (req, res) => {
+    const value = Number(req.body.markup_percent);
+    if (String(req.body.markup_percent).trim() === '' || !Number.isFinite(value) || value < 0 || value > 100) {
+      return res.redirect('/admin?commission=invalid');
+    }
+    setSetting(db, 'markup_percent', String(Math.round(value * 100) / 100));
+    res.redirect('/admin?commission=saved');
   });
 
   router.post('/sync', (req, res) => {

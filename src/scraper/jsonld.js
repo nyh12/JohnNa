@@ -1,4 +1,5 @@
 const cheerio = require('cheerio');
+const { MEMBER_PRICE, NON_MEMBER_PRICE } = require('./price-labels');
 
 /**
  * Extract a normalized product from a product page's HTML using
@@ -16,7 +17,11 @@ function parseProductPage(html, url) {
   const name = clean(product?.name) || clean(meta('og:title'));
   const priceRaw =
     offer?.price ?? offer?.lowPrice ?? meta('product:price:amount') ?? meta('og:price:amount');
-  const price = parsePrice(priceRaw);
+  // S&R pages show "Member Price ₱X / Non-member Price ₱Y" — prefer those.
+  const bodyText = $('body').text().replace(/\s+/g, ' ');
+  const memberPrice = parsePrice(bodyText.match(MEMBER_PRICE)?.[1]);
+  const nonMemberPrice = parsePrice(bodyText.match(NON_MEMBER_PRICE)?.[1]);
+  const price = memberPrice ?? parsePrice(priceRaw);
   if (!name || price == null) return null;
 
   const availability = String(offer?.availability || meta('product:availability') || '');
@@ -31,6 +36,7 @@ function parseProductPage(html, url) {
     description: clean(stripTags(product?.description || meta('og:description') || '')).slice(0, 2000) || null,
     image: absolutize(firstImage(product?.image) || meta('og:image'), url),
     price,
+    regularPrice: nonMemberPrice != null && nonMemberPrice > price ? nonMemberPrice : null,
     currency: offer?.priceCurrency || meta('product:price:currency') || 'PHP',
     inStock,
   };

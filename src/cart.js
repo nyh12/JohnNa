@@ -1,4 +1,4 @@
-const { salePrice, deliveryFee } = require('./pricing');
+const { salePrice, savings, deliveryFee } = require('./pricing');
 
 const COOKIE = 'cart';
 const MAX_QTY = 99;
@@ -51,15 +51,20 @@ function priceCart(db, cart, settings) {
     if (!product) continue;
     const available = product.active === 1 && product.hidden === 0 && product.in_stock === 1;
     const unitPrice = salePrice(product, settings);
-    lines.push({ product, qty: cart[id], unitPrice, lineTotal: unitPrice * cart[id], available });
+    const lineTotal = Math.round(unitPrice * cart[id] * 100) / 100;
+    const lineSavings = Math.round(savings(product, unitPrice) * cart[id] * 100) / 100;
+    lines.push({ product, qty: cart[id], unitPrice, lineTotal, lineSavings, available });
   }
-  const subtotal = lines.filter((l) => l.available).reduce((s, l) => s + l.lineTotal, 0);
+  const ok = lines.filter((l) => l.available);
+  const subtotal = Math.round(ok.reduce((s, l) => s + l.lineTotal, 0) * 100) / 100;
+  const totalSavings = Math.round(ok.reduce((s, l) => s + l.lineSavings, 0) * 100) / 100;
   const delivery = deliveryFee(subtotal, settings);
   return {
     lines,
     subtotal,
     delivery,
-    total: subtotal + delivery,
+    total: Math.round((subtotal + delivery) * 100) / 100,
+    savings: totalSavings,
     count: lines.filter((l) => l.available).reduce((s, l) => s + l.qty, 0),
     hasUnavailable: lines.some((l) => !l.available),
   };

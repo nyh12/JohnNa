@@ -34,6 +34,7 @@
     <div><span>Subtotal</span><span><%= formatPeso(cart.subtotal) %></span></div>
     <div><span>Delivery</span><span><%= cart.delivery ? formatPeso(cart.delivery) : 'FREE' %></span></div>
     <div class="total"><span>Total</span><span><%= formatPeso(cart.total) %></span></div>
+    <% if (cart.savings > 0) { %><div class="save"><span>You save vs S&amp;R non-member prices</span><span><%= formatPeso(cart.savings) %></span></div><% } %>
   </div>
 </div>
 <%- include('partials/footer') %>

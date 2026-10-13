@@ -6,7 +6,11 @@
     <% if (product.brand) { %><div class="brand"><%= product.brand %></div><% } %>
     <h1><%= product.name %></h1>
     <div class="price big"><%= formatPeso(product.price) %></div>
-    <p class="muted">Price includes our shopping &amp; handling fee. Delivery fee is calculated at checkout.</p>
+    <% if (product.price <= product.source_price) { %><div class="badge-member">S&amp;R member price — no membership needed</div><% } %>
+    <% if (product.save > 0) { %>
+      <p class="regular">S&amp;R non-member price <s><%= formatPeso(product.regular_price) %></s> · <span class="save">You save <%= formatPeso(product.save) %></span></p>
+    <% } %>
+    <p class="muted">Delivery fee is calculated at checkout.</p>
     <% if (product.in_stock) { %>
       <form method="post" action="/cart/add" class="add-form">
         <input type="hidden" name="productId" value="<%= product.id %>">

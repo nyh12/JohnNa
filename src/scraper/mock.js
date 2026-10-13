@@ -1,6 +1,6 @@
 /**
  * Sample catalogue for local development and demos (no network access).
- * Prices are illustrative only.
+ * Prices are illustrative only (member price; non-member = +5% like S&R).
  */
 const SAMPLE = [
   ['Kirkland Signature Mixed Nuts 1.13kg', 'Kirkland Signature', 'Food', 1199],
@@ -40,6 +40,7 @@ async function* fetchProducts() {
       description: `${name}. Sample product for development.`,
       image: null,
       price,
+      regularPrice: Math.round(price * 105) / 100, // S&R non-member price is ~5% higher
       currency: 'PHP',
       inStock: i % 11 !== 5, // a couple of out-of-stock items
     };

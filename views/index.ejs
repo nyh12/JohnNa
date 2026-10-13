@@ -35,6 +35,9 @@
             <% if (p.brand) { %><div class="brand"><%= p.brand %></div><% } %>
             <a href="/product/<%= p.id %>" class="name"><%= p.name %></a>
             <div class="price"><%= formatPeso(p.price) %></div>
+            <% if (p.save > 0) { %>
+              <div class="regular">S&amp;R non-member <s><%= formatPeso(p.regular_price) %></s> <span class="save">Save <%= formatPeso(p.save) %></span></div>
+            <% } %>
             <% if (p.in_stock) { %>
               <form method="post" action="/cart/add">
                 <input type="hidden" name="productId" value="<%= p.id %>">

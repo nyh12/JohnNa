@@ -1,4 +1,5 @@
 const adapters = {
+  snr: require('./snr'),
   sitemap: require('./sitemap'),
   shopify: require('./shopify'),
   mock: require('./mock'),

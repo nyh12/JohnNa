@@ -3,9 +3,10 @@ const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
 const DEFAULT_SETTINGS = {
-  markup_percent: '15', // added on top of the S&R shelf price
+  markup_percent: '0', // sales commission % added on top of the S&R member price
   service_fee_per_item: '0', // flat PHP fee per unit
-  round_to: '5', // round sale prices up to the nearest N pesos
+  round_to: '0', // round sale prices up to the nearest N pesos (0 = keep centavos)
+  cap_at_regular: '1', // never charge more than S&R's own non-member price
   delivery_fee: '150',
   free_delivery_over: '5000', // 0 = never free
   min_order: '0',
@@ -13,7 +14,7 @@ const DEFAULT_SETTINGS = {
     'GCash: 09XX-XXX-XXXX (Juan Dela Cruz)\nBDO: 0000-0000-0000 (Juan Dela Cruz)\nPlease send proof of payment with your order code.',
   delivery_areas: 'Metro Manila\nCavite\nLaguna\nRizal\nBulacan',
   notice:
-    'We buy from S&R on your behalf — no membership needed. Prices include our service fee.',
+    'S&R member prices without a membership — we shop at S&R for you.',
 };
 
 function open(dbPath) {
@@ -32,7 +33,8 @@ function open(dbPath) {
       category TEXT,
       description TEXT,
       image TEXT,
-      source_price REAL NOT NULL,
+      source_price REAL NOT NULL,             -- S&R member price
+      regular_price REAL,                     -- S&R non-member price
       currency TEXT DEFAULT 'PHP',
       in_stock INTEGER NOT NULL DEFAULT 1,
       active INTEGER NOT NULL DEFAULT 1,      -- still listed on S&R
@@ -70,7 +72,8 @@ function open(dbPath) {
       product_id INTEGER REFERENCES products(id),
       name TEXT NOT NULL,
       source_url TEXT,
-      source_price REAL NOT NULL,
+      source_price REAL NOT NULL,             -- S&R member price
+      regular_price REAL,                     -- S&R non-member price
       unit_price REAL NOT NULL,
       qty INTEGER NOT NULL
     );
@@ -92,6 +95,10 @@ function open(dbPath) {
       value TEXT NOT NULL
     );
   `);
+
+  // Migrations for databases created by earlier versions
+  const cols = db.prepare('PRAGMA table_info(products)').all().map((c) => c.name);
+  if (!cols.includes('regular_price')) db.exec('ALTER TABLE products ADD COLUMN regular_price REAL');
 
   const insert = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
   for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) insert.run(k, v);

@@ -37,6 +37,7 @@ function mapShopifyProduct(p, baseUrl) {
     description: String(p.body_html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 2000) || null,
     image: p.images?.[0]?.src || null,
     price,
+    regularPrice: null,
     currency: 'PHP',
     inStock: (p.variants || []).some((v) => v.available),
   };

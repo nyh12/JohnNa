@@ -21,6 +21,7 @@ test('parses schema.org Product JSON-LD inside @graph', () => {
     description: 'Tasty',
     image: 'https://shop.example/img/nuts.jpg',
     price: 1199,
+    regularPrice: null,
     currency: 'PHP',
     inStock: true,
   });
@@ -69,4 +70,12 @@ test('maps Shopify products.json entries', () => {
   assert.equal(p.url, 'https://shop/products/nuts');
   assert.equal(p.description, 'Yum');
   assert.equal(p.inStock, true);
+});
+
+test('product page with S&R member / non-member labels prefers the member price', () => {
+  const html = `<script type="application/ld+json">{"@type":"Product","name":"Wine","offers":{"price":"523.95"}}</script>
+    <body><div>Member Price <span>₱ 499.00</span></div><div>Non-member Price: ₱ 523.95</div></body>`;
+  const p = parseProductPage(html, 'https://www.snrshopping.com/wine');
+  assert.equal(p.price, 499);
+  assert.equal(p.regularPrice, 523.95);
 });
